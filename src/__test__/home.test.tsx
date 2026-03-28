@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { ContactForm } from '../app/page'
 
 describe('Home', () => {
   it('renders a heading', () => {
