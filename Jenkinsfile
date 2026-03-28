@@ -1,9 +1,14 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     tools {
         nodejs "NodeJS" // Ensure this name matches your Jenkins Global Tool Configuration
     }
+
 
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['DEV', 'QA', 'PROD'], description: 'Select the environment for deployment')
