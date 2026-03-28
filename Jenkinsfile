@@ -79,12 +79,12 @@ pipeline {
 
                     echo "Deploying to ${env.TARGET_ENV} environment on port ${port}..."
 
-                    // Stop and remove existing container if it exists
-                    sh "docker stop ${containerName} || true"
-                    sh "docker rm ${containerName} || true"
+                    // Forcefully remove existing container if it exists
+                    sh "docker rm -f ${containerName} || true"
 
                     // Run new container
                     sh "docker run -d --name ${containerName} -p ${port}:3000 ${env.DOCKER_IMAGE}:${env.TARGET_ENV.toLowerCase()}"
+
                 }
             }
         }
