@@ -25,12 +25,24 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 script {
-                    // Determine the target environment early based on parameters or job name fallback
-                    env.TARGET_ENV = params.ENVIRONMENT ?: (env.JOB_NAME.contains('QA') ? 'QA' : (env.JOB_NAME.contains('PROD') ? 'PROD' : 'DEV'))
-                    echo "Target Environment: ${env.TARGET_ENV}"
+                    // Determine the target environment by prioritizing the Jenkins Job Name (for multi-job setups)
+                    // If Job name contains QA or PROD, it will override the Choice Parameter default.
+                    def jobName = env.JOB_NAME.toUpperCase()
+                    if (jobName.contains('PROD')) {
+                        env.TARGET_ENV = 'PROD'
+                    } else if (jobName.contains('QA')) {
+                        env.TARGET_ENV = 'QA'
+                    } else if (params.ENVIRONMENT) {
+                        env.TARGET_ENV = params.ENVIRONMENT
+                    } else {
+                        env.TARGET_ENV = 'DEV'
+                    }
+                    
+                    echo "Calculated Target Environment: ${env.TARGET_ENV} for Job: ${env.JOB_NAME}"
                 }
             }
         }
+
 
         stage('Checkout') {
             steps {
