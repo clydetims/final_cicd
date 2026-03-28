@@ -22,6 +22,16 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    // Determine the target environment early based on parameters or job name fallback
+                    env.TARGET_ENV = params.ENVIRONMENT ?: (env.JOB_NAME.contains('QA') ? 'QA' : (env.JOB_NAME.contains('PROD') ? 'PROD' : 'DEV'))
+                    echo "Target Environment: ${env.TARGET_ENV}"
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 echo "Pulling latest code from repository..."
@@ -45,41 +55,41 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo "Building Docker image for ${params.ENVIRONMENT}..."
-                sh "docker build -t ${DOCKER_IMAGE}:${params.ENVIRONMENT.toLowerCase()} ."
+                echo "Building Docker image for ${env.TARGET_ENV}..."
+                sh "docker build -t ${env.DOCKER_IMAGE}:${env.TARGET_ENV.toLowerCase()} ."
             }
         }
 
         stage('Deploy to Environment') {
             steps {
                 script {
-                    def env = params.ENVIRONMENT ?: (env.JOB_NAME.contains('QA') ? 'QA' : (env.JOB_NAME.contains('PROD') ? 'PROD' : 'DEV'))
                     def port = ""
                     def containerName = ""
                     
-                    if (env == 'DEV') {
+                    if (env.TARGET_ENV == 'DEV') {
                         port = DEV_PORT
                         containerName = "realtime-app-dev"
-                    } else if (env == 'QA') {
+                    } else if (env.TARGET_ENV == 'QA') {
                         port = QA_PORT
                         containerName = "realtime-app-qa"
-                    } else if (env == 'PROD') {
+                    } else if (env.TARGET_ENV == 'PROD') {
                         port = PROD_PORT
                         containerName = "realtime-app-prod"
                     }
 
-                    echo "Deploying to ${env} environment on port ${port}..."
+                    echo "Deploying to ${env.TARGET_ENV} environment on port ${port}..."
 
                     // Stop and remove existing container if it exists
                     sh "docker stop ${containerName} || true"
                     sh "docker rm ${containerName} || true"
 
                     // Run new container
-                    sh "docker run -d --name ${containerName} -p ${port}:3000 ${DOCKER_IMAGE}:${env.toLowerCase()}"
+                    sh "docker run -d --name ${containerName} -p ${port}:3000 ${env.DOCKER_IMAGE}:${env.TARGET_ENV.toLowerCase()}"
                 }
             }
         }
     }
+
 
     post {
         success {
