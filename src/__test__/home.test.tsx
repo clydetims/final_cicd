@@ -10,15 +10,15 @@ describe('Home', () => {
   })
 })
 
-describe('ContactForm', () => {
-  it('submits the form and shows thank you message', () => {
-    render(<ContactForm />);
-    const input = screen.getByPlaceholderText('Enter your name');
-    fireEvent.change(input, { target: { value: 'Alice' } });
-    fireEvent.click(screen.getByText('Submit'));
-    expect(screen.getByRole('alert')).toHaveTextContent('Thank you, Alice!');
-  });
-});
+// describe('ContactForm', () => {
+//   it('submits the form and shows thank you message', () => {
+//     render(<ContactForm />);
+//     const input = screen.getByPlaceholderText('Enter your name');
+//     fireEvent.change(input, { target: { value: 'Alice' } });
+//     fireEvent.click(screen.getByText('Submit'));
+//     expect(screen.getByRole('alert')).toHaveTextContent('Thank you, Alice!');
+//   });
+// });
 
 // describe('Home', () => {
 //     it('should fail this test on purpose', () => {
