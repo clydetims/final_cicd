@@ -19,6 +19,7 @@ export default function About() {
                         "Enabling seamless human connection through real-time technology."
                     </p>
                 </div>
+                <p>Clyde Timothy</p>
             </div>
         </section>
     );
